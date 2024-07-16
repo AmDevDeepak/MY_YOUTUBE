@@ -1,70 +1,68 @@
-# Getting Started with Create React App
+## Introduction
+This web application integrates with the YouTube API to display popular videos, implement a search functionality, and provide a video details page with dummy live chat and comments.
+## Structure 
+- Head
+- Body
+  - Sidebar
+    - MenuItems
+  - MainContainer
+    - ButtonList
+    - VideoContainer
+      - VideoCard   
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## APIs
+- Youtube's popular results's api will is used to display video cards on the main page.
+ ## `The main page has infinite scrolling functionality too.`
+- I've used youtube search API in order to implement searching functionality.
+- The search api will be more optimized by doing :
 
-## Available Scripts
+   ```
+        useEffect(() => {
+    const timer = setTimeout(() => getSearchSuggestions(), 200);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-In the project directory, you can run:
+  const getSearchSuggestions = async () => {
+    const response = await fetch(youtubeSearchAPI + searchQuery);
+    const json = await response.json();
+    setSuggestions(json[1]);
+  };
+   ```
+    `Debouncing the search`
 
-### `npm start`
+    -  If a key is pressed on the search. The component will be rendered and useEffect will be called. Api will be called after 200 ms.
+    - When the another key is pressed on the search. The component will be rendered and useEffect will be called again. And for this 2nd key the timer is a fresh one.
+    -  If we press another key even before 200ms the component will be destroyed and call return method of useEffect which will clear the timeout.
+    - A new time will be created and suppose even after 200ms, no key is pressed then it will make an API call for the query.
+    - So basically, In conclusion, we are saving our api calls if the user types very fast on the search bar.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+  `Caching for the search results (More Optimizations) : `
+  
+  We need to implement good caching in order to avoid bad API calls. If we store our search results in an array, then the time complexity of search in array is : `0 (n)` .
+  So if we store our results like : 
+  ```
+  [i, ip, iphp, iphone];
+  ```
+  then for finding iphone, it will take (0)n.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+  ----------------------------------------------------------------
+  Time complexity for search in object is : `0 (1)`, which is better than array. So we can use this.
+  So we will be creating a slice in our redux store for this caching task and will try to optimize the search even more.
 
-### `npm test`
+  ## `So now, the 'search' is using live API, DEBOUNCING and CACHING`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Watch page
+  We have a watch page in the app where a video can we watched. We are using `iframe` tag for that.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Comments 
+We will add `DUMMY` comments on the watch page but the special thing is that each comment can have it's own set of replies which are again an comment at the end of the day and we will be displaying n-level nested commments.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Dummy Live Chat
+  ### Challenges : 
+  - Getting Data Live
+    *We will be using API Polling*
+  - Updating the UI
+    *We will update the UI in optimized way, so that the live chats won't make our page crash or lag. We will be using redux for the whole optimized implimentation.*
+  
+ - A dummy live chat has been implemented successfully.
